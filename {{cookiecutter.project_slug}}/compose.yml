@@ -1,0 +1,10 @@
+services:
+    django:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        volumes:
+            - .:/app
+        shm_size: 4gb
+        env_file:
+            - .env

@@ -1,0 +1,6 @@
+{
+  "project_name": "Django New Project",
+  "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-').replace('_', '-') }}",
+  "default_branch": "master",
+  "project_short_description": "A project description"
+}

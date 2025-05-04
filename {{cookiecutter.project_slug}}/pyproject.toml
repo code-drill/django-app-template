@@ -1,0 +1,19 @@
+[project]
+name = "{{ cookiecutter.project_name.lower().replace(' ', '-').replace('_', '-') }}"
+version = "0.0.1"
+description = "{{ cookiecutter.project_short_description }}"
+authors = [
+    {name = "Michał Rutkowski", email = "homeend@wp.pl"},
+]
+readme = "README.md"
+requires-python = "~=3.12"
+dependencies = [
+    "django==5.1.4",
+    "django-environ==0.11.2",
+    "django-structlog==9.0.0",
+    "django-tasks>=0.6.1",
+    "honcho>=2.0.0",
+    "structlog>=24.4.0",
+    "whitenoise==6.8.2",
+    "more-itertools==10.6.0",
+]
