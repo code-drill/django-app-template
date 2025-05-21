@@ -1,2 +1,6 @@
 docker compose build
-docker build -f Dockerfile --tag {{cookiecutter.project_slug}}:env .
+if [ "$1" == "prod" ]; then
+  docker build -f Dockerfile --tag {{cookiecutter.project_slug}}:prod .
+else
+  docker build -f Dockerfile-dev --tag {{cookiecutter.project_slug}}:dev .
+fi
