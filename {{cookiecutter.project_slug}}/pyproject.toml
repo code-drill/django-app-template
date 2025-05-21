@@ -30,3 +30,25 @@ dev = [
     "testcontainers[postgres]>=4.10.0",
     "time-machine>=2.16.0",
 ]
+
+[tool.black]
+line-length = 120
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.nox
+  | \.tox
+  | \.venv
+  | \._build
+  | buck-out
+  | build
+  | dist
+  # Add this line to exclude all migration directories
+  | migrations
+  # Or, if you want to be more specific to only Python files within migrations:
+  # | .*/migrations/.*\.py
+)/
+'''
