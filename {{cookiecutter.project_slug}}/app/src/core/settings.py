@@ -17,7 +17,9 @@ import structlog
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-environ.Env.read_env(BASE_DIR / ".env")
+django_dot_env_source_file = os.environ.get("DJANGO_DOT_ENV_SOURCE", ".env")
+print("django_dot_env_source_file", django_dot_env_source_file)
+source_file: Path = Path("/app") / django_dot_env_source_file
 
 env = environ.Env(DEBUG=(bool, False))
 
@@ -45,6 +47,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_tasks",
     "django_tasks.backends.database",
+    "rest_framework",
+    "drf_yasg",
 ]
 
 TASKS = {
@@ -101,6 +105,29 @@ DATABASES = {
     }
 }
 
+app_local_db = env("APP_LOCAL_DB", default=None)
+use_local_pg = app_local_db == "postgress"
+
+if use_local_pg:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": env("POSTGRES_DB"),
+            "USER": env("POSTGRES_USER"),
+            "PASSWORD": env("POSTGRES_PASSWORD"),
+            "HOST": env("POSTGRES_HOST"),
+            "PORT": env("POSTGRES_PORT", cast=int, default="5432"),
+        }
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+            "OPTIONS": {"transaction_mode": "EXCLUSIVE"},
+        }
+    }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -144,6 +171,12 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+SWAGGER_USE_COMPAT_RENDERERS = False
+
+SWAGGER_SETTINGS = {
+    "USE_SESSION_AUTH": False,
+    "SWAGGER_USE_COMPAT_RENDERERS": SWAGGER_USE_COMPAT_RENDERERS,
+}
 
 LOGGING = {
     "version": 1,
