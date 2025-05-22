@@ -1,3 +1,7 @@
+## Source
+
+https://github.com/code-drill/django-app-template
+
 ## Usage
 
 ```shell
@@ -42,11 +46,14 @@ uv run honcho start
 ```
 
 ## Structure
+
 - project venv is located under: /home/app_user/venv/bin/
 - project interpretator is located under: /home/app_user/venv/bin/python
 
 ## How to
+
 ### Add App
+
 ```shell
 ./app_shell.bsh # or app_shell.cmd
 cd app/src
@@ -54,12 +61,16 @@ uv run manage.py startapp NEW_APP_NAME
 ```
 
 ### Pycharm setup
-- you can use `PROJECT_SLUG:env` docker image as a interpretator. it is build always when running app_build.cmd/app_build.bsh
 
+- you can use `PROJECT_SLUG:dev` docker image as a interpretator. it is build always when running
+  app_build.cmd/app_build.bsh
 
 ### dev bas setup - migrate, create superuser, collect static
+
 - you can use `/app/app/bin/init-dev.bsh` script to perform all of these three task
+
 ```shell
-./app_shell.bsh # or app_shell.cmd
+./app_shell.bsh
+# or app_shell.cmd
 /app/app/bin/init-dev.bsh
 ```
