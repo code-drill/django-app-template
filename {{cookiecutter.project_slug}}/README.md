@@ -2,6 +2,30 @@
 
 https://github.com/code-drill/django-app-template
 
+## Development
+
+### Build image to use it as python interpreter image name: `{{cookiecutter.project_slug}}:dev`
+
+```shell
+./app_build.bsh
+# or app_build.cmd
+```
+
+### Run shell inside container
+
+```shell
+./app_shell.bsh
+# or app_shell.cmd
+/app/app/bin/init-dev.bsh
+```
+
+### Start app
+
+```shell
+./app_start.bsh
+# or app_start.cmd
+```
+
 ## Usage
 
 ```shell
@@ -69,8 +93,3 @@ uv run manage.py startapp NEW_APP_NAME
 
 - you can use `/app/app/bin/init-dev.bsh` script to perform all of these three task
 
-```shell
-./app_shell.bsh
-# or app_shell.cmd
-/app/app/bin/init-dev.bsh
-```

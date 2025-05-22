@@ -2,5 +2,20 @@
   "project_name": "Django New Project",
   "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-').replace('_', '-') }}",
   "default_branch": "master",
-  "project_short_description": "A project description"
+  "project_short_description": "A project description",
+
+  "use_gunicorn_for_app_start": ["y", "n"],
+  "use_rest_framework": ["y", "n"],
+  "use_django_tasks": ["y", "n"],
+  "use_django_extensions": ["y", "n"],
+  "use_celery": ["y", "n"],
+  "use_celery_beat": ["y", "n"],
+  "use_wait_for_database": ["y", "n"],
+  "use_prometheus": ["y", "n"],
+  "use_health_check": ["y", "n"],
+  "use_business_metrics": ["y", "n"],
+
+  "use_pytest": ["y", "n"],
+  "use_time_machine": ["y", "n"],
+  "add_black_settings": ["y", "n"]
 }

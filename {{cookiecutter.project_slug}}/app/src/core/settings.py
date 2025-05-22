@@ -9,8 +9,9 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-import os
 import logging.config
+import os
+from datetime import timedelta
 from pathlib import Path
 
 import environ
@@ -23,7 +24,7 @@ print("django_dot_env_source_file", django_dot_env_source_file)
 source_file: Path = Path("/app") / django_dot_env_source_file
 
 env = environ.Env(DEBUG=(bool, False))
-
+env.read_env(source_file.resolve(), overwrite=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -40,25 +41,82 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+{% if cookiecutter.use_health_check == "y" %}
+    "health_check",
+    "health_check.db",
+    "health_check.cache",
+    "health_check.storage",
+    "health_check.contrib.migrations",
+    "health_check.contrib.psutil",
+    "health_check.contrib.redis",
+    "health_check.contrib.celery",
+    "health_check.contrib.celery_ping",
+{% endif %}
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+{% if cookiecutter.use_django_extensions == "y" %}
+    "django_extensions",
+{% endif %}
+{% if cookiecutter.use_health_check == "y" %}
+    "django_probes",
+{% endif %}
+    "django_structlog",
+{% if cookiecutter.use_django_tasks == "y" %}
     "django_tasks",
     "django_tasks.backends.database",
-    "rest_framework",
+{% endif %}
+{% if cookiecutter.use_celery == "y" %}
+{% if cookiecutter.use_celery_beat == "y" %}
+    "django_celery_beat",
+{% endif %}
+{% endif %}
+{% if cookiecutter.use_prometheus == "y" %}
+    "django_prometheus",
+{% endif %}
+{% if cookiecutter.use_rest_framework == "y" %}
     "drf_yasg",
+    "rest_framework",
+{% endif %}
 ]
 
+{% if cookiecutter.use_prometheus == "y" %}
+PROMETHEUS_EXPORT_MIGRATIONS = True
+PROMETHEUS_LATENCY_BUCKETS = (
+    0.008,
+    0.016,
+    0.032,
+    0.062,
+    0.125,
+    0.25,
+    0.5,
+    1.0,
+    2.0,
+    4.0,
+    8.0,
+    16.0,
+    32.0,
+    64.0,
+    float("inf"),
+)
+{% endif %}
+
+
+{% if cookiecutter.use_django_tasks == "y" %}
 TASKS = {
     "default": {
         "BACKEND": "django_tasks.backends.database.DatabaseBackend"
     }
 }
+{% endif %}
 
 MIDDLEWARE = [
+{% if cookiecutter.use_prometheus == "y" %}
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
+{% endif %}
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -67,6 +125,9 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+{% if cookiecutter.use_prometheus == "y" %}
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
+{% endif %}
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -172,12 +233,35 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+{% if cookiecutter.use_rest_framework == "y" %}
 SWAGGER_USE_COMPAT_RENDERERS = False
 
 SWAGGER_SETTINGS = {
     "USE_SESSION_AUTH": False,
     "SWAGGER_USE_COMPAT_RENDERERS": SWAGGER_USE_COMPAT_RENDERERS,
 }
+{% endif %}
+
+{% if cookiecutter.use_celery == "y" %}
+REDIS_URL = env("CELERY_BROKER_URL", default="")
+
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="")
+CELERY_RESULT_BACKEND = env("CELERY_BROKER_URL", default="")  # store results in Redis
+
+CELERY_RESULT_EXTENDED = True
+
+CELERY_TIMEZONE = "UTC"
+CELERY_TASK_TRACK_STARTED = True
+
+CELERY_TASK_ROUTES = ["core.celery.route_task"]
+CELERY_TASK_TIME_LIMIT = int(timedelta(minutes=5).total_seconds())
+CELERY_TASK_ALWAYS_EAGER = env.bool("CELERY_TASK_ALWAYS_EAGER", default=False)
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_WORKER_PREFETCH_MULTIPLIER = env.int("CELERY_WORKER_PREFETCH_MULTIPLIER", default=10)
+CELERY_BROKER_POOL_LIMIT = env.int("CELERY_BROKER_POOL_LIMIT", default=50)
+{% endif %}
 
 LOGGING = {
     "version": 1,

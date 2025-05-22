@@ -1,2 +1,14 @@
+{% if cookiecutter.use_gunicorn_for_app_start == "y" %}
+web: PYTHONUNBUFFERED=true /app/app/entrypoint.sh
+{% else %}
 web: PYTHONUNBUFFERED=true python src/manage.py runserver 0.0.0.0:8000
+{% endif %}
+{% if cookiecutter.use_django_tasks == "y" %}
 db_worker: PYTHONUNBUFFERED=true python src/manage.py db_worker
+{% endif %}
+{% if cookiecutter.use_celery == "y" %}
+{% if cookiecutter.use_celery_beat == "y" %}
+worker:    /app/app/celery-entrypoint.sh
+beat:      PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus-multiproc-dir PYTHONPATH=/app/app/src PYTHONUNBUFFERED=true celery -A core beat -l INFO -S django
+{% endif %}
+{% endif %}
