@@ -24,7 +24,7 @@ print("django_dot_env_source_file", django_dot_env_source_file)
 source_file: Path = Path("/app") / django_dot_env_source_file
 
 env = environ.Env(DEBUG=(bool, False))
-
+env.read_env(source_file.resolve(), overwrite=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/

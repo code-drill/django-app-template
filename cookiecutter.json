@@ -4,6 +4,7 @@
   "default_branch": "master",
   "project_short_description": "A project description",
 
+  "use_gunicorn_for_app_start": ["y", "n"],
   "use_rest_framework": ["y", "n"],
   "use_django_tasks": ["y", "n"],
   "use_django_extensions": ["y", "n"],
