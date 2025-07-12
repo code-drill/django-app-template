@@ -86,7 +86,7 @@ uv run manage.py startapp NEW_APP_NAME
 
 ### Pycharm setup
 
-- you can use `PROJECT_SLUG:dev` docker image as a interpretator. it is build always when running
+- you can use `PROJECT_SLUG:dev` docker image as a interpreter. it is build always when running
   app_build.cmd/app_build.bsh
 
 ### dev bas setup - migrate, create superuser, collect static
