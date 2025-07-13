@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -eu
 
 export PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus-multiproc-dir
