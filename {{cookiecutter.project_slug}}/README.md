@@ -89,7 +89,7 @@ uv run manage.py startapp NEW_APP_NAME
 - you can use `PROJECT_SLUG:dev` docker image as a interpreter. it is build always when running
   app_build.cmd/app_build.bsh
 
-### dev bas setup - migrate, create superuser, collect static
+### dev base setup - migrate, create superuser, collect static
 
 - you can use `/app/app/bin/init-dev.bsh` script to perform all of these three task
 
