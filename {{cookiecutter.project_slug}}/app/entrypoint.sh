@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # We assume that WORKDIR is defined in Dockerfile
 export PYTHONPATH=/app/app/src
