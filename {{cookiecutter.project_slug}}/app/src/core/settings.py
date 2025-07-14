@@ -128,6 +128,7 @@ MIDDLEWARE = [
 {% if cookiecutter.use_prometheus == "y" %}
     'django_prometheus.middleware.PrometheusAfterMiddleware',
 {% endif %}
+"django_structlog.middlewares.RequestMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"

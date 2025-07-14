@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-export PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus-multiproc-dir
+export PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus-multiproc-dir/celery-worker
 export PYTHONPATH=/app/app/src
 export PYTHONUNBUFFERED=true
 

@@ -20,6 +20,7 @@ USER $userid
 
 COPY pyproject.toml /app/pyproject.toml
 RUN . /etc/environment && uv sync --group prod
-RUN mkdir -p /tmp/prometheus-multiproc-dir
+RUN mkdir -p /tmp/prometheus-multiproc-dir/celery-worker
+RUN chown -R $userid:$groupid /tmp/prometheus-multiproc-dir/celery-worker /tmp/prometheus-multiproc-dir
 
 CMD ["uv", "run", "/home/app_user/venv/bin/gunicorn", "core.wsgi", "--bind", "0.0.0.0:8000"]

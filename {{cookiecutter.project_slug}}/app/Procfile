@@ -9,6 +9,6 @@ db_worker: PYTHONUNBUFFERED=true python src/manage.py db_worker
 {% if cookiecutter.use_celery == "y" %}
 {% if cookiecutter.use_celery_beat == "y" %}
 worker:    /app/app/celery-entrypoint.sh
-beat:      PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus-multiproc-dir PYTHONPATH=/app/app/src PYTHONUNBUFFERED=true celery -A core beat -l INFO -S django
+beat:      PYTHONPATH=/app/app/src PYTHONUNBUFFERED=true celery -A core beat -l INFO -S django
 {% endif %}
 {% endif %}

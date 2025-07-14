@@ -18,9 +18,23 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
+from core.metrics import metrics_view
+{% if cookiecutter.use_business_metrics == "y" %}
+from core.business_metrics import metrics_manager
+{% endif %}
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+{% if cookiecutter.use_prometheus == "y" %}
+    path("metrics", metrics_view, name="prometheus-django-metrics"),
+{% endif %}
+
+{% if cookiecutter.use_business_metrics == "y" %}
+path("business-metrics", metrics_manager.view, name="prometheus-business-metrics"),
+{% endif %}
+{% if cookiecutter.use_health_check == "y" %}
+path("healthcheck/", include("health_check.urls")),
+{% endif %}
 ]
 
 if settings.DEBUG:

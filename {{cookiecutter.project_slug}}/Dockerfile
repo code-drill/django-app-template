@@ -20,7 +20,8 @@ USER $userid
 
 COPY pyproject.toml /app/pyproject.toml
 RUN . /etc/environment && uv sync
-RUN mkdir -p /tmp/prometheus-multiproc-dir
+RUN mkdir -p /tmp/prometheus-multiproc-dir/celery-worker
+RUN chown -R $userid:$groupid /tmp/prometheus-multiproc-dir/celery-worker /tmp/prometheus-multiproc-dir
 
 ## BEGIN for pycharm to use interpretator form Docker image/Dockerfile
 ENV PATH="/home/app_user/venv/bin:$PATH"
