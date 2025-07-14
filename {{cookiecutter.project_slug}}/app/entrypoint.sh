@@ -2,6 +2,7 @@
 
 # We assume that WORKDIR is defined in Dockerfile
 export PYTHONPATH=/app/app/src
+export PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus-multiproc-dir/
 
 /app/app/prometheus-cleanup.sh
 
