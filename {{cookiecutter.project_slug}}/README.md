@@ -91,5 +91,5 @@ uv run manage.py startapp NEW_APP_NAME
 
 ### dev bas setup - migrate, create superuser, collect static
 
-- you can use `/app/app/bin/init-dev.bsh` script to perform all of these three task
+- you can use `/usr/local/bin/init-dev.bsh` script to perform all of these three task
 
