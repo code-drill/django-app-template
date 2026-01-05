@@ -1,6 +1,6 @@
 docker compose build
 if [ "$1" == "prod" ]; then
-  docker build -f Dockerfile --tag {{cookiecutter.project_slug}}:prod .
+  docker build -f Dockerfile --tag {{cookiecutter.project_slug}}:prod --target prod .
 else
-  docker build -f Dockerfile-dev --tag {{cookiecutter.project_slug}}:dev .
+  docker build -f Dockerfile --tag {{cookiecutter.project_slug}}:dev --target dev .
 fi

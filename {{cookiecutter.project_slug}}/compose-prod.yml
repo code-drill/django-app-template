@@ -1,0 +1,211 @@
+x-app: &default-app
+  image: {{cookiecutter.docker_registry}}/{{cookiecutter.project_slug}}:prod
+  env_file:
+    - .prod.env
+  volumes:
+    - prometheus-metrics:/tmp/prometheus-multiproc-dir
+  shm_size: 4gb
+  restart: unless-stopped
+  deploy:
+    resources:
+      limits:
+        memory: 2G
+      reservations:
+        memory: 512M
+  depends_on:
+    redis:
+      condition: service_healthy
+    postgres:
+      condition: service_healthy
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: redis-{{cookiecutter.project_slug}}
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+        reservations:
+          memory: 256M
+
+  postgres:
+    image: postgres:17.5-alpine
+    container_name: pg17-{{cookiecutter.project_slug}}
+    environment:
+      POSTGRES_DB: {{cookiecutter.project_slug}}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: abc123
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
+    volumes:
+      - ../pg17-{{cookiecutter.project_slug}}:/var/lib/postgresql/data
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    command: >
+      postgres 
+      -c shared_preload_libraries=pg_stat_statements
+      -c max_connections=200
+      -c shared_buffers=256MB
+      -c effective_cache_size=1GB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c work_mem=4MB
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d rss-reader"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
+
+  postgres-backup:
+    image: {{cookiecutter.docker_registry}}/{{cookiecutter.project_slug}}-backup
+    container_name: {{cookiecutter.project_slug}}-backup
+    environment:
+      BACKUP_LOCAL_ROTATE_KEEP_LAST: 10
+      BACKUP_LOCAL_DIR: /var/backups
+      DATABASE_URL: postgresql://postgres:abc123@postgres:5432/rss-reader
+    volumes:
+      - ../{{cookiecutter.project_slug}}-backup:/var/backups
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  django:
+    <<: *default-app
+    container_name: django-{{cookiecutter.project_slug}}
+    environment:
+      APP_LOCAL_DB: postgres
+      POSTGRES_DB: rss-reader
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: abc123
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      DEBUG: false
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      PYTHONDONTWRITEBYTECODE: 1
+      GUNICORN_MAX_WORKERS: 4
+      GUNICORN_TIMEOUT: 120
+      GUNICORN_KEEPALIVE: 5
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      worker:
+        condition: service_started
+      beat:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/healthcheck/"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  worker:
+    <<: *default-app
+    container_name: celery-worker-{{cookiecutter.project_slug}}
+    command: ["celery-entrypoint.bsh"]
+    environment:
+      APP_LOCAL_DB: postgres
+      POSTGRES_DB: rss-reader
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: abc123
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      DEBUG: false
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      PYTHONDONTWRITEBYTECODE: 1
+      CELERY_CONCURRENCY: 4
+      CELERY_MAX_TASKS_PER_CHILD: 1000
+      CELERY_TASK_SOFT_TIME_LIMIT: 300
+      CELERY_TASK_TIME_LIMIT: 600
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "celery", "-A", "core", "inspect", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  beat:
+    <<: *default-app
+    environment:
+      APP_LOCAL_DB: postgres
+      POSTGRES_DB: rss-reader
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: abc123
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      DEBUG: false
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      PYTHONDONTWRITEBYTECODE: 1
+    container_name: celery-beat-{{cookiecutter.project_slug}}
+    command: ["bash", "-c", "cd /app/app && uv run --active /app/app/src/manage.py wait_for_database --timeout 30 && PYTHONPATH=/app/app/src PYTHONUNBUFFERED=true celery -A core beat -l INFO -S django"]
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  redis-data:
+    driver: local
+  prometheus-metrics:
+    # driver should not be local as it makes prometheus multi proc support not work!
+
+networks:
+  default:
+    driver: bridge

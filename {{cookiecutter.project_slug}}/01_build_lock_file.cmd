@@ -1,0 +1,1 @@
+docker run --rm -v "%cd%:/app" -w /app ghcr.io/astral-sh/uv:python3.12-bookworm-slim uv lock

@@ -1,1 +1,2 @@
-docker compose -f compose.yml -f compose-enable-ports.yml run --build --remove-orphans  -P django /bin/bash -c ". /etc/environment && /app/app/bin/app_start.bsh"
+call app_build.cmd
+docker compose -f compose.yml -f compose-enable-ports.yml run --build --remove-orphans  -P django /bin/bash -c ". /etc/environment && /usr/local/bin/app_start.bsh"

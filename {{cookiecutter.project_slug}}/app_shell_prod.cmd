@@ -1,0 +1,1 @@
+docker compose -f compose-prod.yml run django /bin/bash

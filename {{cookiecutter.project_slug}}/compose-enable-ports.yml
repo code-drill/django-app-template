@@ -2,5 +2,12 @@ services:
   django:
     ports:
       - 8000:8000
+      - 5555:5555
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - {{cookiecutter.project_slug}}-network
+
+networks:
+  {{cookiecutter.project_slug}}-network:
+    external: true

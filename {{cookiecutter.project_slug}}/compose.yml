@@ -3,10 +3,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: dev
     environment:
       PYTHONDONTWRITEBYTECODE: 1
       DJANGO_DOT_ENV_SOURCE: ${DJANGO_DOT_ENV_SOURCE:-.env}
     volumes:
       - ./prometheus-metrics:/tmp/prometheus-multiproc-dir
       - .:/app
+      - /app/.venv
+    working_dir: /app/
     shm_size: 4gb
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

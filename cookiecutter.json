@@ -3,6 +3,7 @@
   "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-').replace('_', '-') }}",
   "default_branch": "master",
   "project_short_description": "A project description",
+  "docker_registry": "docker.hm.local:5000",
 
   "use_gunicorn_for_app_start": ["y", "n"],
   "use_rest_framework": ["y", "n"],
@@ -10,6 +11,8 @@
   "use_django_extensions": ["y", "n"],
   "use_celery": ["y", "n"],
   "use_celery_beat": ["y", "n"],
+  "use_playwright": ["y", "n"],
+  "use_postgres": ["y", "n"],
   "use_wait_for_database": ["y", "n"],
   "use_prometheus": ["y", "n"],
   "use_health_check": ["y", "n"],

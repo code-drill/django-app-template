@@ -31,6 +31,9 @@ dependencies = [
 {% if cookiecutter.use_business_metrics == "y" %}
     "django-business-metrics>=1.0.1",
 {% endif %}
+{% if cookiecutter.use_playwright == "y" %}
+    "playwright>=1.54.0",
+{% endif %}
 {% if cookiecutter.use_health_check == "y" %}
     "django-health-check>=3.18.3",
     "psutil>=7.0.0",

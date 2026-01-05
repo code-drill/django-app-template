@@ -169,7 +169,7 @@ DATABASES = {
 }
 
 app_local_db = env("APP_LOCAL_DB", default=None)
-use_local_pg = app_local_db == "postgress"
+use_local_pg = app_local_db == "postgres"
 
 if use_local_pg:
     DATABASES = {

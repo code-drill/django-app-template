@@ -1,0 +1,5 @@
+docker run --rm -d --name redis-{{cookiecutter.project_slug}} --network {{cookiecutter.project_slug}}-network -p 6379:6379 redis:7-alpine
+{% if cookiecutter.use_postgres == "y" %}
+docker run --rm -d -p 5433:5432 --name pg17-{{cookiecutter.project_slug}} --network {{cookiecutter.project_slug}}-network -e POSTGRES_DB={{cookiecutter.project_slug}} -e POSTGRES_PASSWORD=abc123 -e PGDATA=/var/lib/postgresql/data/pgdata -v ../pg17-{{cookiecutter.project_slug}}:/var/lib/postgresql/data postgres:17.5-alpine
+{% endif %}
+

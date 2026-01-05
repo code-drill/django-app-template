@@ -5,6 +5,6 @@ export PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus-multiproc-dir/celery-worker
 export PYTHONPATH=/app/app/src
 export PYTHONUNBUFFERED=true
 
-/app/app/prometheus-cleanup.sh
+prometheus-cleanup.bsh
 
-celery -A core worker -l INFO -c 1 --pidfile=/tmp/celery-%n.pid
+celery -A core worker -l INFO -c 8 --pidfile=/tmp/celery-%n.pid
