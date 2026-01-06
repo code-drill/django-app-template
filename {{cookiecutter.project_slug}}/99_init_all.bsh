@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# Master initialization script - 99_init_all.bsh
+# Finds and executes all DD_init_*.bsh scripts where DD are digits 00-98
+# This script itself (99_init_all.bsh) is excluded from execution
+
+echo "========================================"
+echo "Master Initialization Script"
+echo "========================================"
+echo "Searching for DD_init_*.bsh scripts..."
+echo ""
+
+# Find all matching .bsh scripts with pattern [0-9][0-9]_init_*.bsh
+# Exclude this script (99_init_all.bsh)
+# Sort them numerically by the DD prefix
+scripts=$(find . -maxdepth 1 -type f -name '[0-9][0-9]_init_*.bsh' ! -name '99_init_all.bsh' | sort -V)
+
+# Check if any scripts were found
+if [ -z "$scripts" ]; then
+    echo "No matching DD_init_*.bsh scripts found."
+    exit 0
+fi
+
+# Display found scripts
+echo "Found scripts:"
+line_num=0
+while IFS= read -r script; do
+    line_num=$((line_num + 1))
+    echo "  $line_num. $script"
+done <<< "$scripts"
+echo ""
+
+# Execute each script in order
+script_count=0
+success_count=0
+fail_count=0
+
+while IFS= read -r script; do
+    if [ -f "$script" ]; then
+        script_count=$((script_count + 1))
+        echo "========================================"
+        echo "Executing [$script_count]: $script"
+        echo "========================================"
+        
+        # Check if script is executable
+        if [ ! -x "$script" ]; then
+            echo "Warning: $script is not executable. Setting execute permission..."
+            chmod +x "$script"
+        fi
+        
+        # Execute the script
+        if "$script"; then
+            echo "[✓] Success: $script completed"
+            success_count=$((success_count + 1))
+        else
+            exit_code=$?
+            echo "[✗] Failed: $script returned error code $exit_code"
+            fail_count=$((fail_count + 1))
+        fi
+        echo ""
+    fi
+done <<< "$scripts"
+
+# Summary
+echo "========================================"
+echo "Execution Summary:"
+echo "========================================"
+echo "  Total scripts: $script_count"
+echo "  Successful: $success_count"
+echo "  Failed: $fail_count"
+echo "========================================"
+
+# Exit with error if any script failed
+if [ $fail_count -gt 0 ]; then
+    echo ""
+    echo "WARNING: Some scripts failed!"
+    exit 1
+fi
+
+echo ""
+echo "All initialization scripts completed successfully!"
+exit 0
