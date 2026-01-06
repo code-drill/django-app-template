@@ -16,7 +16,6 @@ https://github.com/code-drill/django-app-template
 ```shell
 ./app_shell.bsh
 # or app_shell.cmd
-/app/app/bin/init-dev.bsh
 ```
 
 ### Start app
@@ -30,19 +29,15 @@ https://github.com/code-drill/django-app-template
 
 ```shell
 # Build container
-## linux / wsl2
-docker compose build --build-arg userid=$(id -u) --build-arg groupid=$(id -g)
-# or
+## *nix
 ./app_build.bsh
 ## windows
-docker compose build
-# or
 app_build.cmd
 
 # Enter container
-docker compose run --remove-orphans  -P django /bin/bash
-docker compose run -P django /bin/bash
+## *nix
 ./app_shell.bsh
+## windows
 app_build.cmd
 
 # Install Django and other dependencies
@@ -72,7 +67,7 @@ uv run honcho start
 ## Structure
 
 - project venv is located under: /home/app_user/venv/bin/
-- project interpretator is located under: /home/app_user/venv/bin/python
+- project interpreter is located under: /home/app_user/venv/bin/python
 
 ## How to
 
@@ -91,5 +86,5 @@ uv run manage.py startapp NEW_APP_NAME
 
 ### dev base setup - migrate, create superuser, collect static
 
-- you can use `/app/app/bin/init-dev.bsh` script to perform all of these three task
+- you can use `/usr/local/bin/init-dev.bsh` script to perform all of these three task
 
