@@ -68,7 +68,7 @@ services:
       -c min_wal_size=1GB
       -c max_wal_size=4GB
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d rss-reader"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d {{cookiecutter.project_slug}}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -85,7 +85,7 @@ services:
     environment:
       BACKUP_LOCAL_ROTATE_KEEP_LAST: 10
       BACKUP_LOCAL_DIR: /var/backups
-      DATABASE_URL: postgresql://postgres:abc123@postgres:5432/rss-reader
+      DATABASE_URL: postgresql://postgres:abc123@postgres:5432/{{cookiecutter.project_slug}}
     volumes:
       - ../{{cookiecutter.project_slug}}-backup:/var/backups
     restart: unless-stopped
@@ -106,7 +106,7 @@ services:
     container_name: django-{{cookiecutter.project_slug}}
     environment:
       APP_LOCAL_DB: postgres
-      POSTGRES_DB: rss-reader
+      POSTGRES_DB: {{cookiecutter.project_slug}}
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: abc123
       POSTGRES_HOST: postgres
@@ -137,6 +137,8 @@ services:
       start_period: 40s
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    volumes:
+      - ./uploads:/app/app/src/uploads:rw
 
   worker:
     <<: *default-app
@@ -144,7 +146,7 @@ services:
     command: ["celery-entrypoint.bsh"]
     environment:
       APP_LOCAL_DB: postgres
-      POSTGRES_DB: rss-reader
+      POSTGRES_DB: {{cookiecutter.project_slug}}
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: abc123
       POSTGRES_HOST: postgres
@@ -175,7 +177,7 @@ services:
     <<: *default-app
     environment:
       APP_LOCAL_DB: postgres
-      POSTGRES_DB: rss-reader
+      POSTGRES_DB: {{cookiecutter.project_slug}}
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: abc123
       POSTGRES_HOST: postgres

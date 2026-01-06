@@ -64,6 +64,9 @@ RUN --mount=type=cache,target=/root/.cache \
         --locked \
         --no-install-project
 
+RUN mkdir -p /app/app/src/uploads && \
+    chmod +777 /app/app/src/uploads
+
 USER $userid
 
 RUN mkdir -p /tmp/prometheus-multiproc-dir/celery-worker && \
