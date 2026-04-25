@@ -1,10 +1,11 @@
 #!/bin/bash
+set -eu
 
 # We assume that WORKDIR is defined in Dockerfile
 export PYTHONPATH=/app/app/src
 export PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus-multiproc-dir/
 
-/app/app/prometheus-cleanup.sh
+/app/app/prometheus-cleanup.bsh
 
 # django-probes
 uv run /app/app/src/manage.py wait_for_database --timeout 10

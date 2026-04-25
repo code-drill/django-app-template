@@ -157,17 +157,6 @@ MEDIA_URL = "/media/"
 WSGI_APPLICATION = "core.wsgi.application"
 
 
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-        "OPTIONS": {'transaction_mode': 'EXCLUSIVE'}
-    }
-}
-
 app_local_db = env("APP_LOCAL_DB", default=None)
 use_local_pg = app_local_db == "postgres"
 
