@@ -10,6 +10,25 @@ echo "========================================"
 echo "Searching for DD_init_*.bsh scripts..."
 echo ""
 
+# Check required tools
+missing_tools=0
+for tool in fd dos2unix; do
+    if ! command -v "$tool" >/dev/null 2>&1; then
+        echo "[✗] Required tool not found: $tool"
+        missing_tools=$((missing_tools + 1))
+    fi
+done
+
+if [ $missing_tools -gt 0 ]; then
+    echo ""
+    echo "ERROR: Please install the missing tool(s) listed above and try again."
+    echo "  - fd:       https://github.com/sharkdp/fd"
+    echo "  - dos2unix: https://waterlan.home.xs4all.nl/dos2unix.html"
+    exit 1
+fi
+
+fd -g "*.bsh" -x dos2unix
+
 # Find all matching .bsh scripts with pattern [0-9][0-9]_init_*.bsh
 # Exclude this script (99_init_all.bsh)
 # Sort them numerically by the DD prefix

@@ -11,6 +11,29 @@ echo ========================================
 echo Searching for DD_init_*.cmd scripts...
 echo.
 
+REM Check required tools
+set missing_tools=0
+where fd >nul 2>&1
+if errorlevel 1 (
+    echo [X] Required tool not found: fd
+    set /a missing_tools+=1
+)
+where dos2unix >nul 2>&1
+if errorlevel 1 (
+    echo [X] Required tool not found: dos2unix
+    set /a missing_tools+=1
+)
+
+if %missing_tools% gtr 0 (
+    echo.
+    echo ERROR: Please install the missing tool(s) listed above and try again.
+    echo   - fd:       https://github.com/sharkdp/fd
+    echo   - dos2unix: https://waterlan.home.xs4all.nl/dos2unix.html
+    exit /b 1
+)
+
+fd -g "*.bsh" -x dos2unix
+
 set script_count=0
 set success_count=0
 set fail_count=0
