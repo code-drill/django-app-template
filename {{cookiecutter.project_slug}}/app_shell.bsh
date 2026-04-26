@@ -1,1 +1,1 @@
-docker compose -f compose.yml run --build --remove-orphans  -P django bash -c "$@"
+docker compose -f compose.yml run --build --remove-orphans  -P django bash
